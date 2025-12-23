@@ -1,0 +1,8 @@
+.elixir_ls/
+_build/
+deps/
+Justfile
+README.md
+.gitignore
+.iex.exs
+.git/
