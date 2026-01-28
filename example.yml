@@ -2,7 +2,7 @@ version: 1
 proxies:
   unsplash:
     host: "https://api.unsplash.com"
-    headers:
+    request_headers:
       add:
         - key: Authorization
           value: "Client-ID %UNSPLASH_API_KEY%"
@@ -25,4 +25,8 @@ proxies:
       grant_type: "authorization_code"
       scopes: "tasks:write tasks:read"
       refresh_token: false
+
+    response_headers:
+      drop:
+        - "transfer-encoding"
 

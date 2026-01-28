@@ -1,19 +1,23 @@
 defmodule ProxyCat.Proxy.Handler do
+  alias ProxyCat.Proxy.StateServer
+  alias ProxyCat.Routing.AuthSpec.Oauth2
   alias ProxyCat.Cache
   require Logger
 
   def init(_args) do
-    config = ProxyCat.Routing.Server.config()
-    %{config: config}
+    []
   end
 
-  def call(%Plug.Conn{} = conn, %{config: config}) do
-    with {:ok, %{host: host, headers: headers}} <- fetch_proxy_config(config, conn) do
-      call_target(conn, host, headers)
+  def call(%Plug.Conn{} = conn, _) do
+    config = ProxyCat.Routing.Server.config()
+
+    with {:ok, %{host: host, target: target, auth: auth, headers: headers}} <-
+           fetch_proxy_config(config, conn) do
+      call_target(conn, config, target, host, headers, auth)
     end
   end
 
-  defp call_target(%Plug.Conn{} = conn, %URI{} = host, headers) do
+  defp call_target(%Plug.Conn{} = conn, config, target, %URI{} = host, headers, auth) do
     method = to_atom_method(conn.method)
 
     path =
@@ -22,12 +26,23 @@ defmodule ProxyCat.Proxy.Handler do
         parts -> Path.join(parts)
       end
 
-    uri = %URI{host | path: path, query: conn.query_string}
+    uri = %URI{host | path: "/" <> path, query: conn.query_string}
 
-    with {:ok, response} <- request(method, uri, headers) do
-      respond_from_response(conn, uri, response)
+    auth_headers = auth_headers(target, auth)
+
+    with {:ok, response} <- request(method, uri, auth_headers ++ headers) do
+      respond_from_response(conn, uri, config, target, response)
     end
   end
+
+  defp auth_headers(target, {:ok, %Oauth2{}}) do
+    %{access_token: access_token, token_type: token_type} =
+      StateServer.retrieve_all(target, [:access_token, :token_type])
+
+    [{"Authorization", "#{token_type} #{access_token}"}]
+  end
+
+  defp auth_headers(_, _), do: []
 
   defp request(method, uri, headers) do
     Cache.cached(cache_key(uri), [cache_match: &should_cache?/1], fn ->
@@ -52,16 +67,18 @@ defmodule ProxyCat.Proxy.Handler do
     |> String.downcase()
   end
 
-  defp respond_from_response(conn, %URI{} = uri, %Req.Response{} = response) do
+  defp respond_from_response(conn, %URI{} = uri, config, target, %Req.Response{} = response) do
     Logger.debug(
       "[#{inspect(__MODULE__)}.Req] [#{response.status}] [#{uri.path}] [#{inspect(response.headers)}]"
     )
 
-    response.headers
+    config
+    |> ProxyCat.Routing.Interface.update_headers(target, :response, response.headers)
     |> Enum.reduce(conn, fn {key, value}, acc ->
       Plug.Conn.put_resp_header(acc, key, Enum.join(value, ";"))
     end)
-    |> Plug.Conn.send_resp(response.status, response.body)
+    |> Plug.Conn.resp(response.status, response.body)
+    |> Plug.Conn.send_resp()
   end
 
   defp to_atom_method(method) do
@@ -77,10 +94,12 @@ defmodule ProxyCat.Proxy.Handler do
          {:ok, host} <- ProxyCat.Routing.Interface.host(config, target) do
       headers =
         config
-        |> ProxyCat.Routing.Interface.update_headers(target, conn.req_headers)
+        |> ProxyCat.Routing.Interface.update_headers(target, :request, conn.req_headers)
         |> Enum.reject(fn {key, _} -> key == @target_header end)
 
-      {:ok, %{host: host, headers: headers}}
+      auth = ProxyCat.Routing.Interface.auth(config, target)
+
+      {:ok, %{target: target, host: host, headers: headers, auth: auth}}
     else
       {:proxy, false} ->
         {:error, :not_found}

@@ -27,6 +27,18 @@ defmodule ProxyCat.Proxy.StateServer do
     def retrieve(name, key) do
       Agent.get(name, fn %{state: state} -> Map.get(state, key) end)
     end
+
+    def retrieve_all(name, keys) do
+      Agent.get(name, fn %{state: state} ->
+        case keys do
+          :all ->
+            state
+
+          keys when is_list(keys) ->
+            Map.new(keys, &{&1, Map.get(state, &1)})
+        end
+      end)
+    end
   end
 
   @name __MODULE__
@@ -50,6 +62,12 @@ defmodule ProxyCat.Proxy.StateServer do
     proxy_key
     |> state_name()
     |> StateAgent.retrieve(key)
+  end
+
+  def retrieve_all(proxy_key, keys) do
+    proxy_key
+    |> state_name()
+    |> StateAgent.retrieve_all(keys)
   end
 
   def clear(proxy_key, key) do

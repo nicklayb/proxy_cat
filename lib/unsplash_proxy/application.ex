@@ -5,6 +5,7 @@ defmodule ProxyCat.Application do
   def start(_type, _args) do
     children = [
       ProxyCat.Routing.Server,
+      ProxyCat.Proxy.StateServer,
       {Box.Cache.Server, name: ProxyCat.Cache},
       ProxyCat.Proxy.Server,
       ProxyCat.Backend.Server

@@ -45,14 +45,18 @@ defmodule ProxyCat.Backend.OauthHandler do
     end
   end
 
+  @keys ~w(access_token expires_in scope token_type)a
+
   defp persist_tokens(%Oauth2{refresh_token: refresh_token}, key, body) do
-    body
-    |> Map.get(body, "access_token")
-    |> then(&ProxyCat.Proxy.StateServer.store(key, :access_token, &1))
+    Enum.each(@keys, fn current_key ->
+      body
+      |> Map.get(to_string(current_key))
+      |> then(&ProxyCat.Proxy.StateServer.store(key, current_key, &1))
+    end)
 
     if refresh_token do
       body
-      |> Map.get(body, "refresh_token")
+      |> Map.get("refresh_token")
       |> then(&ProxyCat.Proxy.StateServer.store(key, :refresh_token, &1))
     end
   end

@@ -7,7 +7,7 @@ defmodule ProxyCat.VariableInjector do
   end
 
   def inject(map, variable_getter) when is_map(map) do
-    Map.new(map, fn {key, value} -> {key, variable_getter.(value)} end)
+    Map.new(map, fn {key, value} -> {key, inject(value, variable_getter)} end)
   end
 
   def inject(string, variable_getter) when is_binary(string) do

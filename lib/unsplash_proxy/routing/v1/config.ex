@@ -45,10 +45,17 @@ defimpl ProxyCat.Routing.Interface, for: ProxyCat.Routing.V1.Config do
     Config.with_proxy(config, key, fn %Config.Proxy{host: host} -> {:ok, host} end)
   end
 
-  def update_headers(%Config{} = config, key, headers) do
-    Config.with_proxy(config, key, fn %Config.Proxy{
-                                        headers: %Config.Proxy.Headers{add: add, drop: drop}
-                                      } ->
+  def update_headers(%Config{} = config, key, request_or_response, headers) do
+    Config.with_proxy(config, key, fn %Config.Proxy{} = proxy ->
+      %Config.Proxy.Headers{
+        add: add,
+        drop: drop
+      } =
+        case request_or_response do
+          :request -> proxy.request_headers
+          :response -> proxy.response_headers
+        end
+
       cleared_headers =
         Enum.reduce(drop, headers, fn key_to_remove, acc ->
           Enum.reject(acc, fn

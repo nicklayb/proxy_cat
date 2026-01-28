@@ -20,18 +20,12 @@ defmodule ProxyCat.Routing.AuthSpec do
           redirect_uri
         ) do
       query =
-        Enum.reduce(
-          [
-            client_id: client_id,
-            scope: scopes,
-            redirect_uri: redirect_uri,
-            response_type: response_type
-          ],
-          %{},
-          fn {key, value}, acc ->
-            Map.put(acc, key, ProxyCat.VariableInjector.inject(value))
-          end
-        )
+        ProxyCat.VariableInjector.inject(%{
+          client_id: client_id,
+          scope: scopes,
+          redirect_uri: redirect_uri,
+          response_type: response_type
+        })
 
       %URI{authorize_url | query: URI.encode_query(query)}
     end
@@ -47,14 +41,15 @@ defmodule ProxyCat.Routing.AuthSpec do
           code,
           redirect_uri
         ) do
-      form_body = %{
-        client_id: client_id,
-        client_secret: client_secret,
-        code: code,
-        grant_type: grant_type,
-        scope: scopes,
-        redirect_uri: redirect_uri
-      }
+      form_body =
+        ProxyCat.VariableInjector.inject(%{
+          client_id: client_id,
+          client_secret: client_secret,
+          code: code,
+          grant_type: grant_type,
+          scope: scopes,
+          redirect_uri: redirect_uri
+        })
 
       {token_url, form_body}
     end
