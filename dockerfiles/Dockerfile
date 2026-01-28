@@ -1,7 +1,7 @@
 # STEP 1 - Build release compiler container
 FROM elixir:1.19-otp-28-alpine AS builder
 
-ENV APP_NAME=unsplash_proxy \
+ENV APP_NAME=proxy_cat \
     APP_VERSION=0.1.0 \
     MIX_ENV=prod
 
@@ -10,7 +10,7 @@ RUN apk update && \
     apk upgrade --no-cache && \
     apk add --no-cache openssl-dev gcc ca-certificates git
 
-WORKDIR /unsplash_proxy
+WORKDIR /proxy_cat
 
 RUN mix local.rebar --force && \
     mix local.hex --force
@@ -50,10 +50,10 @@ RUN chmod a+x /usr/local/bin/entrypoint.sh
 RUN mkdir ${ROOT_FOLDER}/logs
 
 # Create a non-root user
-RUN adduser -D unsplash_proxy && \
-    chown -R unsplash_proxy: ${ROOT_FOLDER}
+RUN adduser -D proxy_cat && \
+    chown -R proxy_cat: ${ROOT_FOLDER}
 
-USER unsplash_proxy
+USER proxy_cat
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["start"]

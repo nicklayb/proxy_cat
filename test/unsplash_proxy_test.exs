@@ -1,8 +1,8 @@
-defmodule UnsplashProxyTest do
+defmodule ProxyCatTest do
   use ExUnit.Case
-  doctest UnsplashProxy
+  doctest ProxyCat
 
   test "greets the world" do
-    assert UnsplashProxy.hello() == :world
+    assert ProxyCat.hello() == :world
   end
 end

@@ -1,4 +1,4 @@
-defmodule UnsplashProxy.Cache do
+defmodule ProxyCat.Cache do
   require Logger
 
   def cached(key, options \\ [], function) do
@@ -13,7 +13,7 @@ defmodule UnsplashProxy.Cache do
   end
 
   defp cache_ttl do
-    :unsplash_proxy
+    :proxy_cat
     |> Application.fetch_env!(__MODULE__)
     |> Keyword.fetch!(:ttl)
     |> then(fn

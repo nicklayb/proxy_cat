@@ -1,0 +1,28 @@
+version: 1
+proxies:
+  unsplash:
+    host: "https://api.unsplash.com"
+    headers:
+      add:
+        - key: Authorization
+          value: "Client-ID %UNSPLASH_API_KEY%"
+
+        - key: "Accept-Version"
+          value: "v1"
+
+      drop:
+        - host
+
+  ticktick:
+    host: "https://ticktick.com"
+    auth:
+      type: oauth2
+      client_id: "%TICKTICK_CLIENT_ID%"
+      client_secret: "%TICKTICK_CLIENT_SECRET%"
+      authorize_url: "https://ticktick.com/oauth/authorize"
+      response_type: "code"
+      token_url: "https://ticktick.com/oauth/token"
+      grant_type: "authorization_code"
+      scopes: "tasks:write tasks:read"
+      refresh_token: false
+
