@@ -1,4 +1,7 @@
 defmodule ProxyCat.Config.Reader.Yaml do
+  @moduledoc """
+  Yaml config file reader
+  """
   @behaviour ProxyCat.Config.Reader
 
   @impl ProxyCat.Config.Reader

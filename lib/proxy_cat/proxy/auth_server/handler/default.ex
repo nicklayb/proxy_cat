@@ -1,8 +1,12 @@
 defmodule ProxyCat.Proxy.AuthServer.Handler.Default do
+  @moduledoc """
+  Default handler that just stores things up and ignore
+  any messages it receives.
+  """
   @behaviour ProxyCat.Proxy.AuthServer.Handler
 
   @impl ProxyCat.Proxy.AuthServer.Handler
-  def init(_), do: %{}
+  def init(_auth_spec), do: %{}
 
   @impl ProxyCat.Proxy.AuthServer.Handler
   def handle_info(_message, state) do

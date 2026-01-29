@@ -1,8 +1,13 @@
 defmodule ProxyCat.Config.V1.Config.Proxy do
-  defstruct [:key, :host, :request_headers, :response_headers, :auth]
+  @moduledoc """
+  Proxy definition
+  """
   use Starchoice.Decoder
-  alias ProxyCat.Config.V1.Config.Proxy.Headers
+
   alias ProxyCat.Config.AuthSpec
+  alias ProxyCat.Config.V1.Config.Proxy.Headers
+
+  defstruct [:key, :host, :request_headers, :response_headers, :auth]
 
   @type t :: %ProxyCat.Config.V1.Config.Proxy{
           key: String.t(),

@@ -1,7 +1,10 @@
 defmodule ProxyCat.Application do
+  @moduledoc """
+  Main application tree
+  """
   use Application
 
-  @impl true
+  @impl Application
   def start(_type, _args) do
     children =
       if env() != :test do

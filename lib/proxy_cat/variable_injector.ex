@@ -36,5 +36,5 @@ defmodule ProxyCat.VariableInjector do
     end)
   end
 
-  def inject(other, _), do: other
+  def inject(other, _getter), do: other
 end

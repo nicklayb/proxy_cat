@@ -26,7 +26,9 @@ defmodule ProxyCat.MixProject do
       {:box, git: "https://github.com/nicklayb/box_ex.git", tag: "0.17.0"},
       {:yaml_elixir, "~> 2.12.0"},
       {:starchoice, "~> 0.3.0"},
-      {:joken, "~> 2.6"}
+      {:joken, "~> 2.6"},
+      {:credo, "~> 1.7", only: ~w(dev test)a, runtime: false},
+      {:dialyxir, "~> 1.4", only: ~w(dev test)a, runtime: false}
     ]
   end
 end

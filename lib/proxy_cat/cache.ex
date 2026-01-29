@@ -1,4 +1,7 @@
 defmodule ProxyCat.Cache do
+  @moduledoc """
+  Cache helpers functions
+  """
   require Logger
 
   @doc "Runs a command trying to fetch it from cache first, caching it if not"
@@ -20,7 +23,7 @@ defmodule ProxyCat.Cache do
     |> Keyword.fetch!(:ttl)
     |> then(fn
       value when value > 0 -> {:enabled, value}
-      _ -> :disabled
+      _other -> :disabled
     end)
   end
 end
