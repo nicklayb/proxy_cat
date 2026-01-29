@@ -8,6 +8,10 @@ defmodule ProxyCat.Config do
     1 => Config.V1.Config
   }
 
+  @type configuration :: Config.V1.Config.t()
+
+  @doc "Reads configured yaml file into proper structure"
+  @spec read_yaml() :: {:ok, configuration()} | {:error, any()}
   def read_yaml do
     with {:ok, %{"version" => version} = body} <- Config.Reader.read(file_location()) do
       {:ok, decode_by_version(version, body)}

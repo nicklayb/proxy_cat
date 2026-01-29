@@ -4,6 +4,8 @@ defmodule ProxyCat.Config.V1.Config do
 
   use Starchoice.Decoder
 
+  @type t :: %Config{proxies: %{atom() => Config.Proxy.t()}}
+
   defdecoder do
     field(:proxies, with: &Config.to_proxies/1)
   end

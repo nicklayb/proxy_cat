@@ -4,6 +4,14 @@ defmodule ProxyCat.Config.V1.Config.Proxy do
   alias ProxyCat.Config.V1.Config.Proxy.Headers
   alias ProxyCat.Config.AuthSpec
 
+  @type t :: %ProxyCat.Config.V1.Config.Proxy{
+          key: String.t(),
+          host: URI.t(),
+          request_headers: Headers.t(),
+          response_headers: Headers.t(),
+          auth: AuthSpec.t()
+        }
+
   defdecoder do
     field(:key)
     field(:host, with: &URI.parse/1)

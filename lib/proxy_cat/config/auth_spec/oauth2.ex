@@ -6,6 +6,17 @@ defmodule ProxyCat.Config.AuthSpec.Oauth2 do
   alias ProxyCat.Backend.Router
   alias ProxyCat.Config.AuthSpec.Oauth2
 
+  @type t :: %ProxyCat.Config.AuthSpec.Oauth2{
+          authorize_url: URI.t(),
+          token_url: URI.t(),
+          client_id: String.t(),
+          response_type: String.t(),
+          client_secret: String.t(),
+          grant_type: String.t(),
+          scopes: String.t(),
+          refresh_token: String.t()
+        }
+
   defdecoder do
     Enum.map(@fields, &field/1)
     Enum.map(@url_fields, fn field -> field(field, with: &URI.parse/1) end)

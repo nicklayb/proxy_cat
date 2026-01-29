@@ -3,6 +3,12 @@ defmodule ProxyCat.Config.V1.Config.Proxy.Headers do
   use Starchoice.Decoder
   alias ProxyCat.Config.V1.Config.Proxy.Headers
 
+  @type t :: %Headers{
+          add: [{String.t(), String.t()}],
+          drop: [String.t()],
+          drop_all: boolean()
+        }
+
   defdecoder do
     field(:add, with: &Headers.to_tuple/1, default: [])
     field(:drop, default: [])

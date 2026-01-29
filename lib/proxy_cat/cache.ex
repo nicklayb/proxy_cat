@@ -1,6 +1,8 @@
 defmodule ProxyCat.Cache do
   require Logger
 
+  @doc "Runs a command trying to fetch it from cache first, caching it if not"
+  @spec cached(any(), [Box.Cache.memoize_option()], function()) :: any()
   def cached(key, options \\ [], function) do
     case cache_ttl() do
       :disabled ->
