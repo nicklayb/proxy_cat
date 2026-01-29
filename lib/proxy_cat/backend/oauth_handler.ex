@@ -1,10 +1,10 @@
 defmodule ProxyCat.Backend.OauthHandler do
-  alias ProxyCat.Routing.AuthSpec.Oauth2
+  alias ProxyCat.Config.AuthSpec.Oauth2
   require Logger
-  def init(_), do: [config: ProxyCat.Routing.Server.config()]
+  def init(_), do: []
 
-  def call(%Plug.Conn{params: %{"key" => proxy_key}} = conn, options) do
-    config = Keyword.fetch!(options, :config)
+  def call(%Plug.Conn{params: %{"key" => proxy_key}} = conn, _) do
+    config = ProxyCat.Config.Server.config()
     atom_key = String.to_existing_atom(proxy_key)
 
     code =
@@ -14,7 +14,7 @@ defmodule ProxyCat.Backend.OauthHandler do
       |> Map.fetch("code")
 
     with {:ok, code} <- code,
-         {:ok, %Oauth2{} = oauth} <- ProxyCat.Routing.Interface.auth(config, atom_key),
+         {:ok, %Oauth2{} = oauth} <- ProxyCat.Config.Interface.auth(config, atom_key),
          {:ok, %Req.Response{}} <- fetch_access_token(oauth, code, atom_key) do
       Logger.info("[#{inspect(__MODULE__)}] [#{proxy_key}] [Success]")
       Plug.Conn.send_resp(conn, 200, "OK")
@@ -31,7 +31,7 @@ defmodule ProxyCat.Backend.OauthHandler do
 
   defp fetch_access_token(%Oauth2{} = oauth, code, key) do
     {uri, params} =
-      Oauth2.token_call_spec(oauth, code, "http://localhost:4004/oauth/callback/#{key}")
+      Oauth2.token_call_spec(oauth, code, key)
 
     url = URI.to_string(uri)
 

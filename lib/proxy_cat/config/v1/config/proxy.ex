@@ -1,8 +1,8 @@
-defmodule ProxyCat.Routing.V1.Config.Proxy do
+defmodule ProxyCat.Config.V1.Config.Proxy do
   defstruct [:key, :host, :request_headers, :response_headers, :auth]
   use Starchoice.Decoder
-  alias ProxyCat.Routing.V1.Config.Proxy.Headers
-  alias ProxyCat.Routing.AuthSpec
+  alias ProxyCat.Config.V1.Config.Proxy.Headers
+  alias ProxyCat.Config.AuthSpec
 
   defdecoder do
     field(:key)

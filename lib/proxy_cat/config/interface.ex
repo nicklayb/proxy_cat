@@ -1,4 +1,4 @@
-defprotocol ProxyCat.Routing.Interface do
+defprotocol ProxyCat.Config.Interface do
   def proxy_exists?(config, key)
   def host(config, key)
   def update_headers(config, key, request_or_response, headers)

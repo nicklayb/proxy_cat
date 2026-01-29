@@ -25,7 +25,8 @@ defmodule ProxyCat.MixProject do
       {:bandit, "~> 1.0"},
       {:box, git: "https://github.com/nicklayb/box_ex.git", tag: "0.17.0"},
       {:yaml_elixir, "~> 2.12.0"},
-      {:starchoice, "~> 0.3.0"}
+      {:starchoice, "~> 0.3.0"},
+      {:joken, "~> 2.6"}
     ]
   end
 end

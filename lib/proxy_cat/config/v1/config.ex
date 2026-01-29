@@ -1,6 +1,6 @@
-defmodule ProxyCat.Routing.V1.Config do
+defmodule ProxyCat.Config.V1.Config do
   defstruct proxies: %{}
-  alias ProxyCat.Routing.V1.Config
+  alias ProxyCat.Config.V1.Config
 
   use Starchoice.Decoder
 
@@ -9,7 +9,9 @@ defmodule ProxyCat.Routing.V1.Config do
   end
 
   def decode(map) do
-    Starchoice.decode!(map, Config)
+    map
+    |> ProxyCat.VariableInjector.inject(&System.get_env/1)
+    |> Starchoice.decode!(Config)
   end
 
   def to_proxies(proxies) do
@@ -36,8 +38,8 @@ defmodule ProxyCat.Routing.V1.Config do
   end
 end
 
-defimpl ProxyCat.Routing.Interface, for: ProxyCat.Routing.V1.Config do
-  alias ProxyCat.Routing.V1.Config
+defimpl ProxyCat.Config.Interface, for: ProxyCat.Config.V1.Config do
+  alias ProxyCat.Config.V1.Config
 
   def proxy_exists?(%Config{proxies: proxies}, key), do: is_map_key(proxies, key)
 
@@ -47,25 +49,24 @@ defimpl ProxyCat.Routing.Interface, for: ProxyCat.Routing.V1.Config do
 
   def update_headers(%Config{} = config, key, request_or_response, headers) do
     Config.with_proxy(config, key, fn %Config.Proxy{} = proxy ->
-      %Config.Proxy.Headers{
-        add: add,
-        drop: drop
-      } =
+      headers_config =
         case request_or_response do
           :request -> proxy.request_headers
           :response -> proxy.response_headers
         end
 
-      cleared_headers =
-        Enum.reduce(drop, headers, fn key_to_remove, acc ->
-          Enum.reject(acc, fn
-            {key, _} -> String.downcase(key) == String.downcase(key_to_remove)
-          end)
-        end)
+      cleared_headers = drop_headers(headers_config, headers)
 
-      Enum.reduce(add, cleared_headers, fn {key, value}, acc ->
-        filled_value = ProxyCat.VariableInjector.inject(value)
-        [{key, filled_value} | acc]
+      headers_config.add ++ cleared_headers
+    end)
+  end
+
+  defp drop_headers(%Config.Proxy.Headers{drop_all: true}, _), do: []
+
+  defp drop_headers(%Config.Proxy.Headers{drop: drop}, headers) do
+    Enum.reduce(drop, headers, fn key_to_remove, acc ->
+      Enum.reject(acc, fn
+        {key, _} -> String.downcase(key) == String.downcase(key_to_remove)
       end)
     end)
   end
@@ -74,7 +75,7 @@ defimpl ProxyCat.Routing.Interface, for: ProxyCat.Routing.V1.Config do
     Enum.reduce(proxies, [], fn {key, %Config.Proxy{auth: auth}}, acc ->
       case auth do
         nil -> acc
-        %auth_spec{} -> [{auth_spec, key} | acc]
+        %_{} = auth_spec -> [{auth_spec, key} | acc]
       end
     end)
   end
