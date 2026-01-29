@@ -9,5 +9,3 @@ proxies:
 
         - key: "Accept-Version"
           value: "v1"
-
-
