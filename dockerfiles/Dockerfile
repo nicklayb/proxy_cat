@@ -2,7 +2,6 @@
 FROM elixir:1.19-otp-28-alpine AS builder
 
 ENV APP_NAME=proxy_cat \
-    APP_VERSION=0.1.0 \
     MIX_ENV=prod
 
 # Install build requirements

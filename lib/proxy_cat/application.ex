@@ -4,6 +4,8 @@ defmodule ProxyCat.Application do
   """
   use Application
 
+  require Logger
+
   @impl Application
   def start(_type, _args) do
     children =
@@ -19,6 +21,7 @@ defmodule ProxyCat.Application do
         []
       end
 
+    Logger.info("[ProxyCat] [#{Application.spec(:proxy_cat, :vsn)}]")
     opts = [strategy: :rest_for_one, name: ProxyCat.Supervisor]
     Supervisor.start_link(children, opts)
   end

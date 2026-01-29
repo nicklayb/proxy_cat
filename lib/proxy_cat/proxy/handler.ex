@@ -17,6 +17,7 @@ defmodule ProxyCat.Proxy.Handler do
   alias ProxyCat.Cache
   alias ProxyCat.Config.AuthSpec.Jwt
   alias ProxyCat.Config.AuthSpec.Oauth2
+  alias ProxyCat.Config.CacheSpec
   alias ProxyCat.Proxy.StateServer
 
   require Logger
@@ -40,9 +41,10 @@ defmodule ProxyCat.Proxy.Handler do
     method = to_atom_method(conn.method)
     uri = build_uri(conn, host)
     all_headers = build_headers(uri, headers, target, auth)
+    cache_spec = ProxyCat.Config.cache(config, target)
 
     with {:ok, body, conn} <- Plug.Conn.read_body(conn),
-         {:ok, response} <- request(method, uri, all_headers, body) do
+         {:ok, response} <- request(method, uri, all_headers, body, cache_spec) do
       respond_from_response(conn, uri, config, target, response)
     end
   end
@@ -83,10 +85,12 @@ defmodule ProxyCat.Proxy.Handler do
 
   defp auth_header(string), do: {"Authorization", string}
 
-  defp request(method, uri, headers, body) do
+  defp request(method, uri, headers, body, cache_spec) do
+    ttl = cache_ttl(cache_spec)
+
     uri
     |> cache_key()
-    |> Cache.cached([cache_match: &should_cache?/1], fn ->
+    |> Cache.cached([cache_match: &should_cache?/1, ttl: ttl], fn ->
       Logger.info(
         "[#{inspect(__MODULE__)}.Req] [#{method}] [#{URI.to_string(uri)}] [#{inspect(headers)}]"
       )
@@ -94,6 +98,9 @@ defmodule ProxyCat.Proxy.Handler do
       Req.request(method: method, url: uri, headers: headers, decode_body: false, body: body)
     end)
   end
+
+  defp cache_ttl(%CacheSpec{ttl: ttl}), do: ttl
+  defp cache_ttl(_), do: 0
 
   defp should_cache?({:ok, %Req.Response{status: status}}) do
     status in 200..299

@@ -11,6 +11,7 @@ defprotocol ProxyCat.Config.Interface do
 
   alias ProxyCat.Config
   alias ProxyCat.Config.AuthSpec
+  alias ProxyCat.Config.CacheSpec
 
   @type header :: {String.t(), String.t()}
 
@@ -28,4 +29,7 @@ defprotocol ProxyCat.Config.Interface do
 
   @spec auth(Config.t(), atom()) :: AuthSpec.t() | nil
   def auth(config, key)
+
+  @spec cache(Config.t(), atom()) :: CacheSpec.t() | nil
+  def cache(config, key)
 end

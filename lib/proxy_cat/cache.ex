@@ -4,10 +4,12 @@ defmodule ProxyCat.Cache do
   """
   require Logger
 
+  @type cached_options :: Box.Cache.memoize_option() | Box.Cache.insert_option()
+
   @doc "Runs a command trying to fetch it from cache first, caching it if not"
-  @spec cached(any(), [Box.Cache.memoize_option()], function()) :: any()
+  @spec cached(any(), [cached_options()], function()) :: any()
   def cached(key, options \\ [], function) do
-    case cache_ttl() do
+    case cache_ttl(options) do
       :disabled ->
         function.()
 
@@ -17,13 +19,10 @@ defmodule ProxyCat.Cache do
     end
   end
 
-  defp cache_ttl do
-    :proxy_cat
-    |> Application.fetch_env!(__MODULE__)
-    |> Keyword.fetch!(:ttl)
-    |> then(fn
+  def cache_ttl(options) do
+    case Keyword.get(options, :ttl) do
       value when value > 0 -> {:enabled, value}
       _other -> :disabled
-    end)
+    end
   end
 end

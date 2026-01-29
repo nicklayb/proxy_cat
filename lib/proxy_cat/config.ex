@@ -18,6 +18,8 @@ defmodule ProxyCat.Config do
 
   defdelegate host(config, key), to: ProxyCat.Config.Interface
   defdelegate proxy_exists?(config, key), to: ProxyCat.Config.Interface
+  defdelegate cache(config, key), to: ProxyCat.Config.Interface
+
   defdelegate current(), to: ProxyCat.Config.Server, as: :config
 
   @versions %{

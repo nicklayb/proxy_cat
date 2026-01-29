@@ -44,6 +44,7 @@ end
 
 defimpl ProxyCat.Config.Interface, for: ProxyCat.Config.V1.Config do
   alias ProxyCat.Config.AuthSpec
+  alias ProxyCat.Config.CacheSpec
   alias ProxyCat.Config.V1.Config
 
   @spec proxy_exists?(Config.t(), atom()) :: boolean()
@@ -106,6 +107,14 @@ defimpl ProxyCat.Config.Interface, for: ProxyCat.Config.V1.Config do
 
       :error ->
         {:error, :no_such_proxy}
+    end
+  end
+
+  @spec cache(Config.t(), atom()) :: CacheSpec.t() | nil
+  def cache(config, key) do
+    case with_proxy(config, key, fn %Config.Proxy{cache: cache} -> {:ok, cache} end) do
+      {:error, :no_such_proxy} -> nil
+      {:ok, cache} -> cache
     end
   end
 end

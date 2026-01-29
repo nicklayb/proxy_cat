@@ -2,6 +2,9 @@ version: 1
 proxies:
   unsplash:
     host: "https://api.unsplash.com"
+    cache:
+      ttl: 5m
+
     request_headers:
       add:
         - key: Authorization
