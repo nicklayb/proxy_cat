@@ -15,12 +15,15 @@ defmodule ProxyCat.Proxy.AuthServer.Handler.Jwt do
   require Logger
 
   @impl Handler
-  def init(%ProxyCat.Config.AuthSpec.Jwt{
-        client_id: client_id,
-        access_token: access_token,
-        refresh_token: refresh_token,
-        refresh_url: refresh_url
-      }) do
+  def init(
+        %ProxyCat.Config.AuthSpec.Jwt{
+          client_id: client_id,
+          access_token: access_token,
+          refresh_token: refresh_token,
+          refresh_url: refresh_url
+        },
+        _key
+      ) do
     send(self(), :check_expiration)
 
     put_tokens(

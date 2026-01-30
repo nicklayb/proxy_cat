@@ -46,9 +46,8 @@ defmodule ProxyCat.Proxy.AuthServer do
     key = Keyword.fetch!(args, :key)
     auth_spec = Keyword.fetch!(args, :auth_spec)
     handler = Handler.handler(auth_spec)
-    initial_state = handler.init(auth_spec)
-
-    Logger.info("[#{inspect(__MODULE__)}] [#{key}] [#{inspect(auth_spec.__struct__)}] started")
+    Logger.info("[#{inspect(__MODULE__)}] [#{key}] [#{inspect(handler)}] started")
+    initial_state = handler.init(auth_spec, key)
 
     state =
       State.put_state(%State{key: key, handler: handler, auth_spec: auth_spec}, initial_state)

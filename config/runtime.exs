@@ -12,3 +12,14 @@ config(:proxy_cat, ProxyCat.Backend.Router,
 )
 
 config(:proxy_cat, ProxyCat.Config, config_yaml: Box.Config.get("CONFIG_YAML"))
+
+default_dets =
+  :proxy_cat
+  |> :code.priv_dir()
+  |> Path.join("datastore.dat")
+
+config(:proxy_cat, ProxyCat.DataStore,
+  adapter:
+    {ProxyCat.DataStore.Adapter.Dets,
+     [table_name: :proxy_cat_data_store, file: Box.Config.get("DETS_FILE", default: default_dets)]}
+)
