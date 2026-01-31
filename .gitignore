@@ -24,3 +24,5 @@ unsplash_proxy-*.tar
 
 .elixir_ls
 custom.example.yml
+.nix-mix
+.nix-hex

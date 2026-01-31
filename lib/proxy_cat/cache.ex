@@ -19,7 +19,7 @@ defmodule ProxyCat.Cache do
     end
   end
 
-  def cache_ttl(options) do
+  defp cache_ttl(options) do
     case Keyword.get(options, :ttl) do
       value when value > 0 -> {:enabled, value}
       _other -> :disabled

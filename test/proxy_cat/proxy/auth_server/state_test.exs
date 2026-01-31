@@ -1,4 +1,4 @@
 defmodule ProxyCat.Proxy.AuthServer.StateTest do
-  use ExUnit.Case
+  use ProxyCat.BaseCase
   doctest ProxyCat.Proxy.AuthServer.State
 end

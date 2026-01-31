@@ -4,7 +4,7 @@ defmodule ProxyCat.DataStore.Adapter do
   """
   @type options :: Keyword.t()
 
-  @callback init(options()) :: options()
+  @callback init(atom(), options()) :: {:ok, options()} | {:error, any()}
   @callback write_all(map(), options()) :: :ok | {:error, any()}
   @callback read_all(map(), options()) :: {:ok, any()} | {:error, any()}
   @callback delete_all([atom()], options()) :: :ok | {:error, any()}

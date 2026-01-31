@@ -37,9 +37,8 @@ defmodule ProxyCat.Config do
   end
 
   defp decode_by_version(version, body) do
-    case Map.fetch(@versions, version) do
-      :error -> {:error, :unsupported_version}
-      {:ok, config} -> config.decode(body)
+    with {:ok, config} <- Box.Map.fetch(@versions, version, :unsupported_version) do
+      config.decode(body)
     end
   end
 

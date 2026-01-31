@@ -13,13 +13,16 @@ config(:proxy_cat, ProxyCat.Backend.Router,
 
 config(:proxy_cat, ProxyCat.Config, config_yaml: Box.Config.get("CONFIG_YAML"))
 
-default_dets =
-  :proxy_cat
-  |> :code.priv_dir()
-  |> Path.join("datastore.dat")
+priv_dir = :code.priv_dir(:proxy_cat)
 
 config(:proxy_cat, ProxyCat.DataStore,
-  adapter:
-    {ProxyCat.DataStore.Adapter.Dets,
-     [table_name: :proxy_cat_data_store, file: Box.Config.get("DETS_FILE", default: default_dets)]}
+  adapter_options: [directory: Box.Config.get("DETS_DIRECTORY", default: to_string(priv_dir))]
 )
+
+{success_level, error_level} =
+  with [success_level, error_level] <-
+         Box.Config.list("HTTP_LOG_LEVELS", default: "info|error", separator: "|") do
+    {String.to_existing_atom(success_level), String.to_existing_atom(error_level)}
+  end
+
+config(:proxy_cat, ProxyCat.Http, log_levels: [success: success_level, error: error_level])

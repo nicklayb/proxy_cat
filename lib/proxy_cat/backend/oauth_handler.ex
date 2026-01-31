@@ -8,6 +8,7 @@ defmodule ProxyCat.Backend.OauthHandler do
 
   @behaviour Plug
   alias ProxyCat.Config.AuthSpec.Oauth2
+  alias ProxyCat.Http
   alias ProxyCat.Proxy.StateServer
   require Logger
 
@@ -31,7 +32,7 @@ defmodule ProxyCat.Backend.OauthHandler do
     with {:ok, atom_key} <- convert_atom(proxy_key),
          {:ok, code} <- Map.fetch(params, "code"),
          {:ok, %Oauth2{} = oauth} <- fetch_auth(config, atom_key),
-         {:ok, %Req.Response{}} <- fetch_access_token(oauth, code, atom_key) do
+         {:ok, _request, %Http.Response{}} <- fetch_access_token(oauth, code, atom_key) do
       Logger.info("[#{inspect(__MODULE__)}] [#{proxy_key}] [Success]")
       Plug.Conn.send_resp(conn, 200, "OK")
     else
@@ -48,6 +49,10 @@ defmodule ProxyCat.Backend.OauthHandler do
   defp handle_error(conn, proxy_key, {:error, :no_such_proxy}) do
     Logger.error("[#{inspect(__MODULE__)}] [#{proxy_key}] :no_such_proxy")
     Plug.Conn.send_resp(conn, 404, "Not found")
+  end
+
+  defp handle_error(conn, proxy_key, {:error, _request, error}) do
+    handle_error(conn, proxy_key, {:error, error})
   end
 
   defp handle_error(conn, proxy_key, {:error, error}) do
@@ -74,16 +79,10 @@ defmodule ProxyCat.Backend.OauthHandler do
 
     url = URI.to_string(uri)
 
-    case Req.post(url: url, form: params) do
-      {:ok, %Req.Response{status: 200, body: body} = response} ->
-        persist_tokens(oauth, key, body)
-        {:ok, response}
-
-      {:ok, response} ->
-        {:error, response}
-
-      error ->
-        error
+    with {:ok, request, %Http.Response{body: body} = response} <-
+           Http.request_200(method: :post, url: url, form: params) do
+      persist_tokens(oauth, key, body)
+      {:ok, request, response}
     end
   end
 

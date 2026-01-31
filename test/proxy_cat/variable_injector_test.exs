@@ -1,4 +1,4 @@
 defmodule ProxyCat.VariableInjectorTest do
-  use ExUnit.Case
+  use ProxyCat.BaseCase
   doctest ProxyCat.VariableInjector
 end

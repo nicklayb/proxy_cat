@@ -18,6 +18,7 @@ defmodule ProxyCat.Proxy.Handler do
   alias ProxyCat.Config.AuthSpec.Jwt
   alias ProxyCat.Config.AuthSpec.Oauth2
   alias ProxyCat.Config.CacheSpec
+  alias ProxyCat.Http
   alias ProxyCat.Proxy.StateServer
 
   require Logger
@@ -32,9 +33,26 @@ defmodule ProxyCat.Proxy.Handler do
     config = ProxyCat.Config.current()
 
     with {:ok, %{host: host, target: target, auth: auth, headers: headers}} <-
-           fetch_proxy_config(config, conn) do
-      call_target(conn, config, target, host, headers, auth)
+           fetch_proxy_config(config, conn),
+         {:ok, %Plug.Conn{} = conn} <- call_target(conn, config, target, host, headers, auth) do
+      conn
+    else
+      error ->
+        handle_error(conn, error)
     end
+  end
+
+  defp handle_error(conn, {:error, %Http.Request{}, %Http.Response{status: status, body: body}}) do
+    Plug.Conn.send_resp(conn, status, body)
+  end
+
+  defp handle_error(conn, {:error, error}) do
+    Logger.error("[#{inspect(__MODULE__)}] [error] #{inspect(error)}")
+    Plug.Conn.send_resp(conn, 500, "Bad request")
+  end
+
+  defp handle_error(conn, error) do
+    handle_error(conn, {:error, error})
   end
 
   defp call_target(%Plug.Conn{} = conn, config, target, %URI{} = host, headers, auth) do
@@ -44,8 +62,8 @@ defmodule ProxyCat.Proxy.Handler do
     cache_spec = ProxyCat.Config.cache(config, target)
 
     with {:ok, body, conn} <- Plug.Conn.read_body(conn),
-         {:ok, response} <- request(method, uri, all_headers, body, cache_spec) do
-      respond_from_response(conn, uri, config, target, response)
+         {:ok, _request, response} <- request(method, uri, all_headers, body, cache_spec) do
+      {:ok, respond_from_response(conn, uri, config, target, response)}
     end
   end
 
@@ -91,24 +109,24 @@ defmodule ProxyCat.Proxy.Handler do
     uri
     |> cache_key()
     |> Cache.cached([cache_match: &should_cache?/1, ttl: ttl], fn ->
-      Logger.info(
-        "[#{inspect(__MODULE__)}.Req] [#{method}] [#{URI.to_string(uri)}] [#{inspect(headers)}]"
-      )
+      Logger.info("[#{inspect(__MODULE__)}] [#{method}] [#{URI.to_string(uri)}]")
 
-      Req.request(method: method, url: uri, headers: headers, decode_body: false, body: body)
+      Http.request_200(
+        method: method,
+        url: uri,
+        headers: headers,
+        decode_body: false,
+        body: body
+      )
     end)
   end
 
   defp cache_ttl(%CacheSpec{ttl: ttl}), do: ttl
-  defp cache_ttl(_), do: 0
+  defp cache_ttl(_missing_cache_spec), do: 0
 
-  defp should_cache?({:ok, %Req.Response{status: status}}) do
-    status in 200..299
-  end
+  defp should_cache?({:ok, _request, %Http.Response{}}), do: true
 
-  defp should_cache?(_non_200_response) do
-    false
-  end
+  defp should_cache?(_non_200_response), do: false
 
   defp cache_key(%URI{path: path, query: query}) do
     :sha256
@@ -117,10 +135,8 @@ defmodule ProxyCat.Proxy.Handler do
     |> String.downcase()
   end
 
-  defp respond_from_response(conn, %URI{} = uri, config, target, %Req.Response{} = response) do
-    Logger.debug(
-      "[#{inspect(__MODULE__)}.Req] [#{response.status}] [#{uri.path}] [#{inspect(response.headers)}]"
-    )
+  defp respond_from_response(conn, %URI{} = uri, config, target, %Http.Response{} = response) do
+    Logger.debug("[#{inspect(__MODULE__)}] [#{response.status}] [#{uri.path}]")
 
     config
     |> ProxyCat.Config.update_headers(target, :response, response.headers)

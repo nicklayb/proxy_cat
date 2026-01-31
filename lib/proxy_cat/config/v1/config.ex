@@ -21,8 +21,14 @@ defmodule ProxyCat.Config.V1.Config do
   @impl ProxyCat.Config
   def decode(map) do
     map
-    |> ProxyCat.VariableInjector.inject(&System.get_env/1)
+    |> ProxyCat.VariableInjector.inject(variable_provider())
     |> Starchoice.decode!(Config)
+  end
+
+  defp variable_provider do
+    :proxy_cat
+    |> Application.fetch_env!(ProxyCat.Config.Reader)
+    |> Keyword.fetch!(:variable_provider)
   end
 
   @doc "Converts map to proxies"
@@ -101,12 +107,8 @@ defimpl ProxyCat.Config.Interface, for: ProxyCat.Config.V1.Config do
   end
 
   defp with_proxy(%Config{proxies: proxies}, key, function) do
-    case Map.fetch(proxies, key) do
-      {:ok, %Config.Proxy{} = proxy} ->
-        function.(proxy)
-
-      :error ->
-        {:error, :no_such_proxy}
+    with {:ok, %Config.Proxy{} = proxy} <- Box.Map.fetch(proxies, key, :no_such_proxy) do
+      function.(proxy)
     end
   end
 
