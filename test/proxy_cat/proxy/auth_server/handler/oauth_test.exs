@@ -1,5 +1,5 @@
 defmodule ProxyCat.Proxy.AuthServer.Handler.OauthTest do
-  use ProxyCat.BaseCase
+  use ProxyCat.BaseCase, async: true
 
   alias ProxyCat.Config.AuthSpec
   alias ProxyCat.Proxy.AuthServer.Handler.Oauth

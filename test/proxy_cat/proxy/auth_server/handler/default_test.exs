@@ -1,5 +1,5 @@
 defmodule ProxyCat.Proxy.AuthServer.Handler.DefaultTest do
-  use ProxyCat.BaseCase
+  use ProxyCat.BaseCase, async: true
 
   alias ProxyCat.Proxy.AuthServer.Handler.Default
 

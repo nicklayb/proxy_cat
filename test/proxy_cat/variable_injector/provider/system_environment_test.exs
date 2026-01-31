@@ -1,5 +1,5 @@
 defmodule ProxyCat.VariableInjector.Provider.SystemEnvironmentTest do
-  use ProxyCat.BaseCase
+  use ProxyCat.BaseCase, async: true
 
   describe "provider/1" do
     setup [:set_environment]

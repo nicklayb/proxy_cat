@@ -1,0 +1,4 @@
+version: 1
+proxies:
+  dragons:
+    host: "https://dragons.com"

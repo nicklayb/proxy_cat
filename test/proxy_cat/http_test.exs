@@ -1,5 +1,5 @@
 defmodule ProxyCat.HttpTest do
-  use ProxyCat.BaseCase
+  use ProxyCat.BaseCase, async: true
 
   alias ProxyCat.Http
   alias ProxyCat.Http.Error

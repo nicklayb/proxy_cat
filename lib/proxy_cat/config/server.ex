@@ -29,7 +29,7 @@ defmodule ProxyCat.Config.Server do
   end
 
   defp init do
-    {:ok, config} = ProxyCat.Config.read_yaml()
+    {:ok, config} = ProxyCat.Config.read()
     config
   end
 end

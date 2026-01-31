@@ -15,7 +15,7 @@ services:
   proxy_cat:
     image: nboisvert/proxy_cat:latest
     environment:
-      - CONFIG_YAML=/config.yml
+      - CONFIG_FILe=/config.yml
     volumes:
       - ./config.yml:/config.yml
 ```

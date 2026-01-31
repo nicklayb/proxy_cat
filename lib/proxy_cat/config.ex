@@ -28,9 +28,9 @@ defmodule ProxyCat.Config do
 
   @type t :: Config.V1.Config.t()
 
-  @doc "Reads configured yaml file into proper structure"
-  @spec read_yaml() :: {:ok, t()} | {:error, any()}
-  def read_yaml do
+  @doc "Reads configured file into proper structure"
+  @spec read() :: {:ok, t()} | {:error, any()}
+  def read do
     with {:ok, %{"version" => version} = body} <- Config.Reader.read(file_location()) do
       {:ok, decode_by_version(version, body)}
     end
@@ -45,6 +45,6 @@ defmodule ProxyCat.Config do
   defp file_location do
     :proxy_cat
     |> Application.fetch_env!(__MODULE__)
-    |> Keyword.fetch!(:config_yaml)
+    |> Keyword.fetch!(:file)
   end
 end

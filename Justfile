@@ -23,7 +23,7 @@ docker-run: docker-build
     -e BACKEND_PORT=$BACKEND_PORT \
     -e PORT=$PORT \
     -e UNSPLASH_API_KEY=$UNSPLASH_API_KEY \
-    -e CONFIG_YAML=/example.yml \
+    -e CONFIG_FILE=/example.yml \
     --mount type=bind,src=./example.yml,dst=/example.yml \
     {{image_tag}}
 
