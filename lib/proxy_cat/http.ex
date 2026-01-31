@@ -70,7 +70,7 @@ defmodule ProxyCat.Http do
     with level when level != false <- log_level(:success) do
       Logger.log(
         level,
-        "[#{inspect(__MODULE__)}] [#{String.upcase(to_string(request.method))}] [#{response.status}] #{URI.to_string(request.url)}"
+        "[#{inspect(__MODULE__)}] [#{String.upcase(to_string(request.method))}] [#{response.status}] #{request.url}"
       )
     end
   end
