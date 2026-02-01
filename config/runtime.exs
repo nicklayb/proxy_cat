@@ -11,7 +11,9 @@ config(:proxy_cat, ProxyCat.Backend.Router,
   host: Box.Config.uri("BACKEND_HOST", default: "http://localhost:#{port}")
 )
 
-config(:proxy_cat, ProxyCat.Config, file: Path.expand(Box.Config.get("CONFIG_FILE")))
+config(:proxy_cat, ProxyCat.Config,
+  file: Path.expand(Box.Config.get("CONFIG_FILE", test: "./example.yml"))
+)
 
 priv_dir = :code.priv_dir(:proxy_cat)
 
