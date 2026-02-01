@@ -8,6 +8,7 @@ defmodule ProxyCat.BaseCase do
     quote do
       import ProxyCat.BaseCase
       import Mox, only: [verify_on_exit!: 1, set_mox_global: 1]
+      import ProxyCat.Support.Async
       import ProxyCat.Support.Date
       import ProxyCat.Support.Fixtures
       import ProxyCat.Support.TestFixture

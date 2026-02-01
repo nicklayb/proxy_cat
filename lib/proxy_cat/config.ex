@@ -42,7 +42,9 @@ defmodule ProxyCat.Config do
     end
   end
 
-  defp file_location do
+  @doc "Returns the configured file location"
+  @spec file_location() :: Path.t()
+  def file_location do
     :proxy_cat
     |> Application.fetch_env!(__MODULE__)
     |> Keyword.fetch!(:file)

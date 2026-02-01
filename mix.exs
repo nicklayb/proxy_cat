@@ -35,7 +35,8 @@ defmodule ProxyCat.MixProject do
       {:credo, "~> 1.7", only: ~w(dev test)a, runtime: false},
       {:dialyxir, "~> 1.4", only: ~w(dev test)a, runtime: false},
       {:mox, "~> 1.0", only: :test},
-      {:assertions, "~> 0.22", only: :test}
+      {:assertions, "~> 0.22", only: :test},
+      {:file_system, "~> 1.0"}
     ]
   end
 

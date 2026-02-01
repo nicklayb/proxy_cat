@@ -23,6 +23,7 @@
             erlang_26
             direnv
             just
+            inotify-tools
             beamMinimal28Packages.elixir-ls
           ];
 
