@@ -82,7 +82,7 @@ defmodule ProxyCat.Config.Server do
         Logger.info("[#{inspect(__MODULE__)}] [hot reload] enabled")
         watcher_pid
       else
-        _ -> nil
+        _ignore -> nil
       end
 
     Map.put(state, :watcher_pid, pid)

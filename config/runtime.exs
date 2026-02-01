@@ -28,5 +28,5 @@ config(:proxy_cat, ProxyCat.DataStore,
 config(:proxy_cat, ProxyCat.Http, log_levels: [success: success_level, error: error_level])
 
 config(:proxy_cat, ProxyCat.Config.Server,
-  hot_reload_enabled?: Box.Config.bool("CONFIG_HOT_RELOAD", default: "true")
+  hot_reload_enabled?: Box.Config.bool("CONFIG_HOT_RELOAD", default: "true", test: false)
 )
