@@ -37,7 +37,7 @@ WORKDIR ${ROOT_FOLDER}
 # Update kernel and install runtime dependencies
 RUN apk update && \
     apk upgrade --no-cache && \
-    apk add --no-cache gcc bash openssl wget
+    apk add --no-cache gcc bash openssl wget inotify-tools
 
 # Copy the OTP binary from the build step
 COPY --from=builder /opt/build .
