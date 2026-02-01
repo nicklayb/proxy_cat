@@ -32,7 +32,8 @@ defmodule ProxyCat.Backend.Router do
 
   def path(path, query) do
     query = URI.encode_query(query)
-    uri = %URI{host() | path: path, query: query}
+    %URI{} = host = host()
+    uri = %URI{host | path: path, query: query}
     URI.to_string(uri)
   end
 

@@ -44,7 +44,7 @@ defmodule ProxyCat.Config.AuthSpec.Oauth2 do
   @spec authorize_url(t(), atom()) :: URI.t()
   def authorize_url(
         %Oauth2{
-          authorize_url: authorize_url,
+          authorize_url: %URI{} = authorize_url,
           client_id: client_id,
           scopes: scopes,
           response_type: response_type

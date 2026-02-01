@@ -49,7 +49,7 @@ defmodule ProxyCat.MixProject do
 
   defp aliases do
     [
-      lint: ["compile --warning-as-errors", "credo --strict", "dialyzer", "test"]
+      lint: ["compile --warnings-as-errors", "credo --strict", "dialyzer", "test"]
     ]
   end
 end
