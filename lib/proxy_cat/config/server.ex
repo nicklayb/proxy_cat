@@ -38,7 +38,7 @@ defmodule ProxyCat.Config.Server do
     {:stop, :normal, state}
   end
 
-  @expected_events ~w(modified closed)a
+  @expected_events ~w(modified)a
   @impl GenServer
   def handle_info(
         {:file_event, watcher_pid, {file_location, events}},
@@ -79,7 +79,7 @@ defmodule ProxyCat.Config.Server do
   defp init_file_system_watcher(%{file_location: file_location} = state) do
     pid =
       with :ok <- hot_reload_enabled(),
-           {:ok, watcher_pid} <- FileSystem.start_link(dirs: [file_location]) do
+           {:ok, watcher_pid} <- FileSystem.start_link(dirs: [file_location], backend: :fs_poll) do
         FileSystem.subscribe(watcher_pid)
         Logger.info("[#{inspect(__MODULE__)}] [hot reload] enabled")
         watcher_pid
