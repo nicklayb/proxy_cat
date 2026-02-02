@@ -44,6 +44,8 @@ defmodule ProxyCat.Config.Server do
         {:file_event, watcher_pid, {file_location, events}},
         %{watcher_pid: watcher_pid, file_location: file_location} = state
       ) do
+    Logger.debug("[#{inspect(__MODULE__)}] [file_event] [#{inspect(events)}]")
+
     if Enum.all?(@expected_events, fn event -> event in events end) do
       Logger.info("[#{inspect(__MODULE__)}] [hot reload] restarting...")
       {:stop, :normal, state}
