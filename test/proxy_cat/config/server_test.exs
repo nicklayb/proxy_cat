@@ -37,7 +37,7 @@ defmodule ProxyCat.Config.ServerTest do
 
   describe "handle_info/2" do
     @tag config_file: @config_file
-    test "hot reloads when it receives :modified and :closed events", %{
+    test "hot reloads when it receives :modified evebt", %{
       server_state: server_state
     } do
       assert {:stop, :normal, ^server_state} =
@@ -47,16 +47,11 @@ defmodule ProxyCat.Config.ServerTest do
     end
 
     @tag config_file: @config_file
-    test "ignores if it's missing either :modified or :closed events", %{
+    test "ignores if it's missing either :modified event", %{
       server_state: server_state
     } do
       assert {:noreply, ^server_state} =
                [events: [:closed]]
-               |> file_event(server_state)
-               |> Server.handle_info(server_state)
-
-      assert {:noreply, ^server_state} =
-               [events: [:modified]]
                |> file_event(server_state)
                |> Server.handle_info(server_state)
     end
