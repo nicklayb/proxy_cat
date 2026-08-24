@@ -11,4 +11,9 @@ config(:proxy_cat, ProxyCat.Http, adapter: ProxyCat.Http.Adapter.Req)
 
 config(:proxy_cat, ProxyCat.DataStore, adapter: ProxyCat.DataStore.Adapter.Dets)
 
+config(:logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id]
+)
+
 if config_env() == :test, do: import_config("test.exs")
